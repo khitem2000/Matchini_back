@@ -4,7 +4,6 @@ const { Schema, model } = mongoose;
 
 const clientSchema = new Schema(
     {
-       
         FirstName:{
             type:String,
             require:true

@@ -43,6 +43,21 @@ const userSchema = new Schema(
         Image:{
             type:String,
             require:true
+        },
+        Matches:{
+            type:[mongoose.Schema.Types.ObjectId]
+        },
+        AboutYou:{
+            type:String,
+            require:true
+        },
+        Job :{
+            type:String,
+            require:true
+        },
+        School:{
+            type:String,
+            require:true
         }
 
     },

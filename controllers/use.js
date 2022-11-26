@@ -6,7 +6,9 @@ import crypto from 'crypto';
 import nodemailer from'nodemailer';
 import {sendmailresetpassword} from "../services/mailer.js"
 
+
 import {generatePassword} from '../services/generatePassword.js'
+import mongoose from "mongoose";
 var saltRounds = 10;
 const password = generatePassword();
 // export async function login(req, res) {
@@ -23,26 +25,27 @@ const password = generatePassword();
 // }
 export async function signup(req, res) {
 	const  hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
-	User.create({ login: req.body.login,
-		lastname: req.body.lastname,
+	User.create({ 
+		login: req.body.login,
+		lastname: "",
 		password: hashedPwd,	
 		FirstName:"",
 		LasteName:"",
-		Age:1,
+		Age:req.body.Age,
 		Numero:"",
 		Sexe:"",
-		Image:""
+		Image:`${req.protocol}://${req.get('host')}/img/${req.file.filename}`,
 		})
 	  .then(
 		res.status(200).json({
 			login: req.body.login,
 		  password: req.body.password,
+		  Image:req.body.Image
 		}))
 	  .catch((err) => {
 		res.status(500).json({ error: err });
 	  });
 	}
-
 	export async function login(req, res) {
 		const user = await User.findOne({ login: req.body.login });
 		if (user) {
@@ -160,11 +163,9 @@ export async function googleVerifier(req, res) {
   res.status(401).json({ error: "User does not exist" });
 }
 }	 
-
-
 export function putOnce(req, res) {
 	User
-	.findOneAndUpdate({ "login": req.body.login }, { "FirstName": req.body.FirstName,  "LasteName": req.body.LasteName,  "Age": req.body.Age ,  "Numero": req.body.Numero, "Sexe": req.body.Sexe , "Image" : req.body.Image}, {new: true})
+	.findOneAndUpdate({ "login": req.body.login }, { "FirstName": req.body.FirstName,  "LasteName": req.body.LasteName,  "Age": req.body.Age ,  "Numero": req.body.Numero, "Sexe": req.body.Sexe , "Image" : req.body.Image,"AboutYou" : req.body.AboutYou,"Job" : req.body.Job,"School" : req.body.School},{new: true})
 	.then(doc => {
 	  res.status(200).json({message: "your account is now verified"});
 	})
@@ -174,7 +175,7 @@ export function putOnce(req, res) {
 
 } 
 export async function forgot(req, res) {
-
+	
 	const user = await User.findOne({ login: req.body.login });
 	if(user){
 		const verificationcode = generatePassword();
@@ -202,3 +203,87 @@ export async function forgot(req, res) {
 	});
   }
 
+  export  async function getUser(req, res) {
+	const user = await User.findOne({ login: req.body.login });
+	User.find({})
+    .then((docs) => {
+      let list = [];
+      for (let i = 0; i < docs.length; i++) {
+        list.push({
+		login: docs[i].login,
+        FirstName: docs[i].FirstName,
+        Age: docs[i].Age,
+        Image: docs[i].Image,
+		id: docs[i]._id,
+        });
+      }
+	  
+	  const index = list.findIndex((el) => (el.login ===req.body.login  ));
+	  console.log("test 1 " ,index)
+		 list.splice(index , 1)
+		 console.log("test 2" , user)
+
+      res.status(200).json(list);
+    })
+    .catch((err) => {
+      res.status(500).json({ error: err });
+    });
+
+  };
+  export  async function getConnectedUser(req, res) {
+	User.findOne({ login: req.body.login }).then((docs) => {
+		let list = [];
+		  list.push({
+		  login: docs.login,
+		  FirstName: docs.FirstName,
+		  Age: docs.Age,
+		  Image: docs.Image,
+		  id : docs._id,
+		  });
+		res.status(200).json(list);
+	  })
+    };
+	export  async function getObjectId(req, res) {
+		User.findOne({ login: req.body.login }).then((docs) => {
+			// let list = [];
+			
+			//   list.push({
+				const id =docs._id;
+			
+
+			//   });
+			  res.status(200).json({key: "key", value:id });
+		  })
+		  
+		};
+// export  async function addMatches(req, res) {
+
+// 	 var user = User.find({ login: req.body.login })
+// 	 .then((docs) => {
+// 			let list =[];
+//       console.log(list);
+// 	list.push({Matches :req.body.Matches})
+// 	console.log("hhhhhhhhh" +docs[i].Matches)
+// 	res.status(200).json(list);
+// }
+// ).catch(err=> {
+// 	res.status(505).json({error: err});
+// })
+//     }
+
+ export  async function addMatches(req, res) {
+ 	var user = User.findOneAndUpdate({ login: req.body.login },{ $push: { Matches: req.body.Matches } } , {new: true}).then((docs)=>{
+		res.status(200).json( user);
+	}).catch(err=> {
+			res.status(505).json({error: err});
+		})
+
+ 
+ }
+	// 	var user = await User
+	// .findOneAndUpdate({ "login": req.body.login}, { "Matches": req.body.Matches}, {new: true})
+	
+	//   res.status(200).json(user);
+	//   console.log("hhhhhhhhh" +req.body.Matches)
+
+		

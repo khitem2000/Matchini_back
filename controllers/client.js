@@ -22,6 +22,7 @@ export async function addOnce(req, res){
 	Sexe: req.body.Sexe,
 	Description: req.body.Description,
 	User: req.body.login
+	
 
 		})
 	  .then(

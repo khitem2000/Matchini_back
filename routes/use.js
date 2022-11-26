@@ -1,17 +1,17 @@
 
 import express from 'express';
 
-import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword} from '../controllers/use.js';
-  
+import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches} from '../controllers/use.js';
+import multer from "../middlewares/multer-config.js";
+
 const router = express.Router();
 
 router
   .route('/login')
   .post(login);
-  
   router
   .route('/signup')
-  .post(signup);
+  .post(multer("image", 5 * 1024 * 1024) , signup);
   router
   .route('/forgot')
   .post(forgot);
@@ -35,6 +35,17 @@ router
   router
   .route('/restorPassword')
   .put(restorPassword);
-  
+  router
+  .route('/getUser')
+  .post(getUser);
+  router
+  .route('/getConnectedUser')
+  .post(getConnectedUser);
+  router
+  .route('/getObjectId')
+  .post(getObjectId);
+  router
+  .route('/addMatches')
+  .put(addMatches);
 
   export default router;
