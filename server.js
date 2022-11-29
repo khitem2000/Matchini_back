@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import userRoutes from './routes/use.js';
 import clientRoutes from './routes/client.js';
-
+import posteSchema from './routes/post.js'
 
 const app = express();
 const port = process.env.PORT || 9090;
@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/img', express.static('public/images'));
 app.use('/user', userRoutes);
 app.use('/client', clientRoutes);
+app.use('/post', posteSchema);
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
