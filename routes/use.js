@@ -1,7 +1,7 @@
 
 import express from 'express';
 
-import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches} from '../controllers/use.js';
+import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches,filter , IsMatched, addMatches2,showme,Userconnect ,chatconecte} from '../controllers/use.js';
 import multer from "../middlewares/multer-config.js";
 
 const router = express.Router();
@@ -11,7 +11,7 @@ router
   .post(login);
   router
   .route('/signup')
-  .post(multer("image", 5 * 1024 * 1024) , signup);
+  .post(multer("Image", 512 * 1024) , signup);
   router
   .route('/forgot')
   .post(forgot);
@@ -47,5 +47,22 @@ router
   router
   .route('/addMatches')
   .put(addMatches);
-
+  router
+  .route('/filter')
+  .get(filter);
+  router
+  .route('/IsMatched/:login')
+  .post(IsMatched);
+  router
+  .route('/addMatches2/:login')
+  .put(addMatches2);
+  router
+  .route('/showme')
+  .get(showme);
+  router
+  .route('/Userconnect')
+  .get(Userconnect);
+  router
+  .route('/chatconecte')
+  .put(chatconecte);
   export default router;

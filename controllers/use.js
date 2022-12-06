@@ -1,14 +1,13 @@
 
 import User from "../models/use.js";
 import bcrypt from 'bcrypt';
-import async from'async';
+import async, { forEach } from'async';
 import crypto from 'crypto';
 import nodemailer from'nodemailer';
 import {sendmailresetpassword} from "../services/mailer.js"
-
-
 import {generatePassword} from '../services/generatePassword.js'
 import mongoose from "mongoose";
+import { match } from "assert";
 var saltRounds = 10;
 const password = generatePassword();
 // export async function login(req, res) {
@@ -23,29 +22,25 @@ const password = generatePassword();
 //         res.status(500).json({ error: err });
 //     });
 // }
-export async function signup(req, res) {
-	const  hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
-	User.create({ 
-		login: req.body.login,
-		lastname: "",
-		password: hashedPwd,	
-		FirstName:"",
-		LasteName:"",
-		Age:req.body.Age,
-		Numero:"",
-		Sexe:"",
-	//	Image:`${req.protocol}://${req.get('host')}/img/${req.file.filename}`,
-		})
-	  .then(
-		res.status(200).json({
-			login: req.body.login,
-		  password: req.body.password,
-		  Image:req.body.Image
-		}))
-	  .catch((err) => {
-		res.status(500).json({ error: err });
-	  });
-	}
+	export async function signup(req, res) {
+		const  hashedPwd = await bcrypt.hash(req.body.password, saltRounds);
+		User.create({ login: req.body.login,
+			lastname: "",
+			password: hashedPwd,	
+			FirstName:"",
+			LasteName:"",
+			Age:req.body.Age,
+			Numero:"",
+			Sexe:"",
+			Image:`${req.protocol}://172.16.3.162:9090/img/${req.file.filename}`,
+			})
+		  .then(
+			res.status(200).json({
+				login: req.body.login,
+			  password: req.body.password,
+			}))
+		 
+		}
 	export async function login(req, res) {
 		const user = await User.findOne({ login: req.body.login });
 		if (user) {
@@ -280,10 +275,128 @@ export async function forgot(req, res) {
 
  
  }
+ export  async function addMatches2(req, res) {
+	var id = ""
+	 await User.findOne({ login: req.params.login }, {new: true}).then((docs) => {
+			 id = docs._id; 
+	  })
+	var user = User.findOneAndUpdate({ login: req.body.login },{ $push: { Matches: id } } , {new: true}).then((docs)=>{
+	  
+   })
+}
 	// 	var user = await User
 	// .findOneAndUpdate({ "login": req.body.login}, { "Matches": req.body.Matches}, {new: true})
 	
 	//   res.status(200).json(user);
 	//   console.log("hhhhhhhhh" +req.body.Matches)
 
+	export async function filter(req,res){
+		/*const user =await User.find({ Age: req.body.Age })
+		const filter = {}
+		if (user) {
+		const { Age } =user
+		if (Age) {
+			filter.Age = Age 
+		}
+		res.status(200).json( {filter});
+	}
+	else{
+		res.status(500).json("error" );
+	}*/
+	User.find({
+		$or: [
+			{ Age: req.body.Age }, { Age: 100}
+		]
+	}, (err, res) => {
+		console.log(res)
 		
+	});
+	}
+export async function IsMatched(req,res ){
+	
+	var id = ""
+	 await User.findOne({ login: req.body.login }, {new: true}).then((docs) => {
+			 id = docs._id; 
+			var user2= User.findOne({login: req.params.login}).then((docss) => {
+				var matches = docss.Matches
+				for (let i = 0; i < matches.length; i++) {
+					if (docss.Matches[i].equals(id)) {
+						
+						res.send("match already exists");
+					} else {
+						console.log("---------------" );
+				    User.findOneAndUpdate({ login: req.params.login },{ $push: { Matches: id } } ).then((docss) => {
+							res.send("done");
+						})
+					}	}
+		 })
+	  })
+	  let list = null
+	  var user =await User.findOne({login:req.params.login})
+	  list = {Matches :user.Matches}
+			list.Matches.forEach((i)=>{
+			 if(id.equals(i)){
+				res.status(200).json({key: "key", value:  true});
+			}
+	}
+	)
+}
+	export async function showme(req,res,authenticateUser){
+		const users = await User.find({ Sexe: req.body.Sexe});
+	
+	
+		if (User.Sexe === "Male" && User.sexualPreference === "Straight") {
+	
+		const users = await User.find({ gender: "Female", sexualPreference: "Straight"}).toArray();
+		 
+	
+		};
+		res.status(200).json(users)
+	  }
+	  
+	  export async function Userconnect (req,res){
+		const users = await User.find({ login: req.body.login});
+		 User.find({})
+		.then((doc) => {
+			let list = [];
+			for (let i = 0; i < doc.length; i++) {
+			  if (doc[i].status==true){
+				list.push({
+					login: doc[i].login
+					});
+				res.status(200).json(list)
+			}else{
+				res.status(500).json("user is not connected")
+			}
+			}
+		})
+	  }
+	  export async function chatconecte(req,res){
+		let list1 = [];
+		let list = [];
+		User.find({})
+    .then((docs) => {
+      for (let i = 0; i < docs.length; i++) {
+        list1.push(
+		 docs[i]._id
+        );
+		console.log("les ids 1 :",list1);
+	}})
+	await User.findOne({ login: req.body.login}).then((doc)=>{
+		doc.Matches.forEach((i)=>{
+			for (let j = 0; j <=list1.length; j++){
+				if(i.equals(list1[j]))
+				{User.findById(mongoose.Types.ObjectId(i))
+					.then((docs) => {
+					list.push({doc : docs}); 
+					console.warn("list=====",list)
+					})}
+				}})
+				console.warn("l////////",list)
+				res.status(200).json(list);	
+			 })
+
+		.catch(err =>{
+			res.status(500).json({error: err})
+		})
+	}
