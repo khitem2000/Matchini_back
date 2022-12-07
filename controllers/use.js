@@ -32,7 +32,7 @@ const password = generatePassword();
 			Age:req.body.Age,
 			Numero:"",
 			Sexe:"",
-			Image:`${req.protocol}://172.16.3.162:9090/img/${req.file.filename}`,
+			Image:`${req.protocol}://192.168.1.14:9090/img/${req.file.filename}`,
 			})
 		  .then(
 			res.status(200).json({
@@ -239,17 +239,22 @@ export async function forgot(req, res) {
 	  })
     };
 	export  async function getObjectId(req, res) {
-		User.findOne({ login: req.body.login }).then((docs) => {
-			// let list = [];
-			
-			//   list.push({
-				const id =docs._id;
-			
-
-			//   });
-			  res.status(200).json({key: "key", value:id });
+		var id1=""
+		var id2 = ""
+		var list = []
+		
+		await User.findOne({ login: req.body.login }).then((docs) => {
+				 id1 =docs._id;
 		  })
-		  
+		await User.findOne({ login: req.params.login }).then((doc) => {
+			id2 =doc._id;
+			console.log("=======",id2);
+		 
+	 })
+	 list.push({id1 , id2})
+	 var list2 = [{key : "key" , value : id1 },{key : "key1" , value: id2}]
+	 res.status(200).json(list2);
+
 		};
 // export  async function addMatches(req, res) {
 
@@ -371,6 +376,7 @@ export async function IsMatched(req,res ){
 			}
 		})
 	  }
+	  
 	  export async function chatconecte(req,res){
 		let list1 = [];
 		let list = [];

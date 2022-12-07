@@ -42,7 +42,7 @@ router
   .route('/getConnectedUser')
   .post(getConnectedUser);
   router
-  .route('/getObjectId')
+  .route('/getObjectId/:login')
   .post(getObjectId);
   router
   .route('/addMatches')
