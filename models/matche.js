@@ -30,6 +30,11 @@ const matcheSchema = new Schema(
             type : Boolean,
             default:false
         },
+        RommeName:{
+    
+            type : String,
+            require:true
+        },
     
     
     },{timestamps : true })
