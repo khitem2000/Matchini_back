@@ -2,6 +2,7 @@ import { log } from "async";
 import Matche from "../models/matche.js";
 import User from "../models/use.js";
 import mongoose from "mongoose";
+import { login } from "./use.js";
 export async function matches(req, res){
     try {
         const { User1_param, User2_param } = req.params;
@@ -39,14 +40,37 @@ export async function matches(req, res){
       }
     }
   export async function amie (req,res){
+    var finalList =[]
     const {userid}=req.params
     const List= []
    const docs = await Matche.find({})
       for (let i = 0; i < docs.length; i++) {
-       if (docs[i].User1._id .equals(mongoose.Types.ObjectId(userid))) List.push(docs[i].User2);
-       if (docs[i].User2._id .equals(mongoose.Types.ObjectId(userid))) List.push(docs[i].User1);
+       if ( docs[i].Match==true && docs[i].User1._id .equals(mongoose.Types.ObjectId(userid))) List.push(docs[i].User2 );
+       if (docs[i].Match==true && docs[i].User2._id .equals(mongoose.Types.ObjectId(userid))) List.push(docs[i].User1  );
        console.log("test2",List+"\n")
 	}
-   res.status(200).json(List)
+
+
+  for(let k = 0; k <List.length; k++){
+    console.log('=====',k)
+    var friend = await User.findById({_id: mongoose.Types.ObjectId(List[k])})
+finalList.push({login : friend.login ,
+                FirstName : friend.FirstName ,
+                LasteName : friend.LasteName ,
+                Age: friend.Age,
+                Image : friend.Image })
+  }
+  
+   res.status(200).json(finalList)
+  
  }
+//   for(let k = 0; k <List.length; k++){
+//     console.log('=====',k)
+//     var friend = await User.findById({_id: mongoose.Types.ObjectId(List[k])})
+// finalList.push({friend})
+//   }
+  
+//    res.status(200).json(finalList)
+  
+//  }
   

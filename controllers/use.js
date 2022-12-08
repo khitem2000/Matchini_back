@@ -406,3 +406,11 @@ export async function IsMatched(req,res ){
 			res.status(500).json({error: err})
 		})
 	}
+	export async function getId(req,res){
+		var id=""
+	var user=	await User.findOne({login: req.body.login }).then((docs) => {
+			id =docs._id;
+	 })
+	 console.log("=======",id)
+	 res.status(200).json({key: "key", value:id })
+	}

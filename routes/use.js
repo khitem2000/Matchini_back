@@ -1,7 +1,7 @@
 
 import express from 'express';
 
-import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches,filter , IsMatched, addMatches2,showme,Userconnect ,chatconecte} from '../controllers/use.js';
+import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches,filter , IsMatched, addMatches2,showme,Userconnect ,chatconecte,getId} from '../controllers/use.js';
 import multer from "../middlewares/multer-config.js";
 
 const router = express.Router();
@@ -65,4 +65,7 @@ router
   router
   .route('/chatconecte')
   .put(chatconecte);
+  router
+  .route('/getId')
+  .put(getId)
   export default router;
