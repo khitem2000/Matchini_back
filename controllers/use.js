@@ -199,31 +199,53 @@ export async function forgot(req, res) {
   }
 
   export  async function getUser(req, res) {
-	const user = await User.findOne({ login: req.body.login });
-	User.find({})
+	var agemax = null
+	var agemin = null
+	var index2 = null
+	 await User.findOne({ login: req.body.login }).then((doc)=>{
+		agemax = doc.AgeMax
+		agemin = doc.AgeMin
+	})
+	await User.find({})
     .then((docs) => {
       let list = [];
       for (let i = 0; i < docs.length; i++) {
-        list.push({
-		login: docs[i].login,
-        FirstName: docs[i].FirstName,
-        Age: docs[i].Age,
-        Image: docs[i].Image,
-		id: docs[i]._id,
-        });
+		if (docs[i].login != null) {
+				list.push({
+					login: docs[i].login,
+					FirstName: docs[i].FirstName,
+					Age: docs[i].Age,
+					Image: docs[i].Image,
+					id: docs[i]._id
+					});
+				 list.forEach((el)=>{
+				 	if(el.Age > agemin  || el.Age < agemax){
+							console.log(el.Age);
+					 	}
+						
+					})
+					if(agemax!= null && agemin != null){
+						 index2 = list.findIndex((el) => (el.Age > agemax || el.Age < agemin ));
+						
+						
+		}
       }
-	  
-	  const index = list.findIndex((el) => (el.login ===req.body.login  ));
-	  console.log("test 1 " ,index)
+	  if (index2 != -1) {
+		if (agemax != "" && agemax!= null && agemin != "" && agemin!= null) {
+			list.splice(index2 , 1)
+			
+		 }
+	  }
+	
+	}
+		
+		 const index = list.findIndex((el) => (el.login ===req.body.login  ));
 		 list.splice(index , 1)
-		 console.log("test 2" , user)
-
       res.status(200).json(list);
     })
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-
   };
   export  async function getConnectedUser(req, res) {
 	User.findOne({ login: req.body.login }).then((docs) => {
@@ -346,7 +368,7 @@ export async function IsMatched(req,res ){
 	}
 	)
 }
-	export async function showme(req,res,authenticateUser){
+	export async function showme(req,res){
 		const users = await User.find({ Sexe: req.body.Sexe});
 	
 	
@@ -414,3 +436,37 @@ export async function IsMatched(req,res ){
 	 console.log("=======",id)
 	 res.status(200).json({key: "key", value:id })
 	}
+	export async function addAgePref(req , res ){
+		var user = await User.findOneAndUpdate({ "login": req.body.login },{ "AgeMax" : req.body.AgeMax,"AgeMin" : req.body.AgeMin}).then(
+			
+		)
+		res.status(200).json({user})
+	}
+	export async function DeleteAcc(req,res){
+		await 	User
+		.findOneAndUpdate
+		({ "login": req.params.login },
+		 { "login" : null ,
+		  "password" : null,
+		  "FirstName": null, 
+		   "LasteName": null, 
+			"Age": null , 
+			 "Numero": null, 
+			 "Sexe": null ,
+			  "Image" : null,
+			  "AboutYou" : null,
+			  "Job" : null,
+			  "School" : null }
+			  ,{new: true})
+			  .then(res.status(200).json({message: "done"}))
+		
+	}
+	export async function getOne(req,res) {
+		await User.findOne({ login: req.body.login }).then((doc)=>{
+			res.status(200).json({
+				login : doc.login ,
+				Image : doc.Image
+			});
+		})
+		
+	  }

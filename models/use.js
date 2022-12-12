@@ -59,7 +59,15 @@ const userSchema = new Schema(
         School:{
             type:String,
             require:true
-        }
+        },
+        AgeMax:{
+            type:String,
+          
+        },
+        AgeMin:{
+            type:String,
+          
+        },
 
     },
     {
