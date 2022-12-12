@@ -32,7 +32,7 @@ const password = generatePassword();
 			Age:req.body.Age,
 			Numero:"",
 			Sexe:"",
-			Image:`${req.protocol}://172.16.3.162:9090/img/${req.file.filename}`,
+			Image:`${req.protocol}://192.168.1.11:9090/img/${req.file.filename}`,
 			})
 		  .then(
 			res.status(200).json({
@@ -160,7 +160,7 @@ export async function googleVerifier(req, res) {
 }	 
 export function putOnce(req, res) {
 	User
-	.findOneAndUpdate({ "login": req.body.login }, { "FirstName": req.body.FirstName,  "LasteName": req.body.LasteName,  "Age": req.body.Age ,  "Numero": req.body.Numero, "Sexe": req.body.Sexe , "Image" : req.body.Image,"AboutYou" : req.body.AboutYou,"Job" : req.body.Job,"School" : req.body.School},{new: true})
+	.findOneAndUpdate({ "login": req.body.login }, { "FirstName": req.body.FirstName,  "LasteName": req.body.LasteName,  "Age": req.body.Age ,  "Numero": req.body.Numero, "Sexe": req.body.Sexe , "Image" : req.body.Image,"AboutYou" : req.body.AboutYou,"Job" : req.body.Job,"School" : req.body.School ,$push: { ListImages: `${req.protocol}://192.168.1.11:9090/img/${req.file.filename}` }},{new: true})
 	.then(doc => {
 	  res.status(200).json({message: "your account is now verified"});
 	})
@@ -197,33 +197,64 @@ export async function forgot(req, res) {
 		res.status(500).json({ error: err });
 	});
   }
+  export async function getOne(req,res) {
+	await User.findOne({ login: req.body.login }).then((doc)=>{
+		res.status(200).json({
+			login : doc.login ,
+			Image : doc.Image
+		});
+	})
+	
+  }
 
   export  async function getUser(req, res) {
-	const user = await User.findOne({ login: req.body.login });
-	User.find({})
+	var agemax = null
+	var agemin = null
+	var index2 = null
+	 await User.findOne({ login: req.body.login }).then((doc)=>{
+		agemax = doc.AgeMax
+		agemin = doc.AgeMin
+	})
+	await User.find({})
     .then((docs) => {
       let list = [];
       for (let i = 0; i < docs.length; i++) {
-        list.push({
-		login: docs[i].login,
-        FirstName: docs[i].FirstName,
-        Age: docs[i].Age,
-        Image: docs[i].Image,
-		id: docs[i]._id,
-        });
+		if (docs[i].login != null) {
+				list.push({
+					login: docs[i].login,
+					FirstName: docs[i].FirstName,
+					Age: docs[i].Age,
+					Image: docs[i].Image,
+					id: docs[i]._id
+					});
+				 list.forEach((el)=>{
+				 	if(el.Age > agemin  || el.Age < agemax){
+							console.log(el.Age);
+					 	}
+						
+					})
+					if(agemax!= null && agemin != null){
+						 index2 = list.findIndex((el) => (el.Age > agemax || el.Age < agemin ));
+						
+						
+		}
       }
-	  
-	  const index = list.findIndex((el) => (el.login ===req.body.login  ));
-	  console.log("test 1 " ,index)
+	  if (index2 != -1) {
+		if (agemax != "" && agemax!= null && agemin != "" && agemin!= null) {
+			list.splice(index2 , 1)
+			
+		 }
+	  }
+	
+	}
+		
+		 const index = list.findIndex((el) => (el.login ===req.body.login  ));
 		 list.splice(index , 1)
-		 console.log("test 2" , user)
-
       res.status(200).json(list);
     })
     .catch((err) => {
       res.status(500).json({ error: err });
     });
-
   };
   export  async function getConnectedUser(req, res) {
 	User.findOne({ login: req.body.login }).then((docs) => {
@@ -236,6 +267,7 @@ export async function forgot(req, res) {
 		  id : docs._id,
 		  });
 		res.status(200).json(list);
+	
 	  })
     };
 	export  async function getObjectId(req, res) {
@@ -283,6 +315,12 @@ export async function forgot(req, res) {
 	var user = User.findOneAndUpdate({ login: req.body.login },{ $push: { Matches: id } } , {new: true}).then((docs)=>{
 	  
    })
+}
+export async function addAgePref(req , res ){
+	var user = await User.findOneAndUpdate({ "login": req.body.login },{ "AgeMax" : req.body.AgeMax,"AgeMin" : req.body.AgeMin}).then(
+		
+	)
+	res.status(200).json({user})
 }
 	// 	var user = await User
 	// .findOneAndUpdate({ "login": req.body.login}, { "Matches": req.body.Matches}, {new: true})
@@ -400,3 +438,24 @@ export async function IsMatched(req,res ){
 			res.status(500).json({error: err})
 		})
 	}
+	export async function DeleteAcc(req,res){
+	await 	User
+	.findOneAndUpdate
+	({ "login": req.params.login },
+	 { "login" : null ,
+	  "password" : null,
+	  "FirstName": null, 
+	   "LasteName": null, 
+	    "Age": null , 
+		 "Numero": null, 
+		 "Sexe": null ,
+		  "Image" : null,
+		  "AboutYou" : null,
+		  "Job" : null,
+		  "School" : null }
+		  ,{new: true})
+		  .then(res.status(200).json({message: "done"}))
+	
+}
+	
+	

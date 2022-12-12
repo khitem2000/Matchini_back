@@ -22,43 +22,51 @@ const userSchema = new Schema(
         },
         FirstName:{
             type:String,
-            require:true
+            
         },
         LasteName:{
             type:String,
-            require:true
+            
         },
         Age:{
             type:Number,
-            require:true
+            
         },
         Numero:{
             type:String,
-            require:true
+           
         },
         Sexe:{
             type:String,
-            require:true
+           
         },
         Image:{
             type:String,
-            require:true
+           
         },
         Matches:{
             type:[mongoose.Schema.Types.ObjectId]
         },
         AboutYou:{
             type:String,
-            require:true
+           
         },
         Job :{
             type:String,
-            require:true
+            
         },
         School:{
             type:String,
-            require:true
-        }
+            
+        },
+        AgeMax:{
+            type:String,
+          
+        },
+        AgeMin:{
+            type:String,
+          
+        },
 
     },
     {

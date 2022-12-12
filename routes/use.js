@@ -1,11 +1,8 @@
 
 import express from 'express';
-
-import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches,filter , IsMatched, addMatches2,showme,Userconnect ,chatconecte} from '../controllers/use.js';
+import { login,signup, patchOnce,googleSignUp,googleSignIn,googleVerifier, putOnce, forgot ,restorPassword,getUser,getConnectedUser , getObjectId , addMatches,filter , IsMatched, addMatches2,showme,Userconnect ,chatconecte, getOne , DeleteAcc ,addAgePref} from '../controllers/use.js';
 import multer from "../middlewares/multer-config.js";
-
 const router = express.Router();
-
 router
   .route('/login')
   .post(login);
@@ -31,7 +28,7 @@ router
   .post(googleVerifier);
 router
   .route('/modifier')
-  .put(putOnce);
+  .put(multer("Image", 512 * 1024) ,putOnce);
   router
   .route('/restorPassword')
   .put(restorPassword);
@@ -65,4 +62,14 @@ router
   router
   .route('/chatconecte')
   .put(chatconecte);
+  router
+  .route('/getOne')
+  .post(getOne);
+  router
+  .route('/DeleteAcc/:login')
+  .put( DeleteAcc);
+  router
+  .route('/addAgePref')
+  .put( addAgePref);
+  
   export default router;
