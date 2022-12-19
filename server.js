@@ -8,7 +8,7 @@ import matcheSchema from './routes/matche.js';
 const app = express();
 const port = process.env.PORT || 9090;
 const databaseName = 'matchiniRahmaKhitem';
-const hostname = '192.168.1.14';
+const hostname = '192.168.1.44';
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 mongoose
