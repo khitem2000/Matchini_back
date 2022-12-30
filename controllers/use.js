@@ -32,7 +32,7 @@ const password = generatePassword();
 			Age:req.body.Age,
 			Numero:"",
 			Sexe:"",
-			Image:`${req.protocol}://192.168.1.44:9090/img/${req.file.filename}`,
+			Image:`${req.protocol}://192.168.1.12:9090/img/${req.file.filename}`,
 			})
 		  .then(
 			res.status(200).json({
